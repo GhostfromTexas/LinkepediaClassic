@@ -1,0 +1,14 @@
+## Title: Linkepedia
+## Version: 1.5.0
+## Author: GhostfromTexas
+## Interface: 60200
+## Notes: Remembers item links so you can type them out later.
+## SavedVariables: LNKPDSV_ActiveItemLink
+## SavedVariables: LNKPDSV_ValidSearchID
+## SavedVariables: LNKPDSV_Version
+## SavedVariables: LNKPDSV_AutoCompleteDelay
+
+LinkepediaFrame.lua
+LinkepediaUtils.lua
+Linkepedia.lua
+LinkepediaFrame.xml

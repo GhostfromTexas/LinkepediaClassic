@@ -1,0 +1,506 @@
+﻿<Ui xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="LinkepediaFrame.lua" />
+	<GameTooltip name="LinkepediaTip" inherits="GameTooltipTemplate" parent="UIParent">
+		<Scripts>
+			<OnLoad>
+				self:SetOwner(UIParent, "ANCHOR_NONE");
+			</OnLoad>
+			<OnTooltipSetItem>
+				if (self.printHyperlinkID) then
+				local name, link = self:GetItem();
+				if (name ~= "" and link) then
+				local _, _, itemID = string.find(link, "item:(%d+)");
+				if (itemID) then
+				GFWUtils.Print("Item ID "..itemID..": "..link);
+				end
+				self.printHyperlinkID = nil;
+				end
+				end
+			</OnTooltipSetItem>
+			<OnUpdate>
+				if (self.printHyperlinkID) then
+				local name, link = self:GetItem();
+				if (name ~= "" and link) then
+				local _, _, itemID = string.find(link, "item:(%d+)");
+				if (itemID) then
+				GFWUtils.Print("Item ID "..itemID..": "..link);
+				end
+				self.printHyperlinkID = nil;
+				end
+				end
+			</OnUpdate>
+		</Scripts>
+	</GameTooltip>
+	<Frame name="LNKPDFrame_BuildCache" hidden="true" toplevel="true" movable="true" enableMouse="true" clampedToScreen="true">
+		<Size>
+			<AbsDimension x="442" y="177" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativePoint="CENTER">
+				<Offset x="0" y="0" />
+			</Anchor>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32" />
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="LNKPDFrame_BuildCache_Title" inherits="GameFontNormal" text="Building Linkepedia Database...">
+					<Size>
+						<AbsDimension x="408" y="21" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="16" y="-25" />
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="LNKPDFrame_BuildCache_Status1" inherits="GameFontNormal" text="Status 1" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="214" y="19" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="34" y="-44" />
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="LNKPDFrame_BuildCache_Status2" inherits="GameFontNormal" text="Status 2" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="211" y="15" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="34" y="-61" />
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="LNKPDFrame_BuildCache_Status3" inherits="GameFontNormal" text="Status 3" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="211" y="15" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="34" y="-77" />
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="LNKPDFrame_BuildCache_LinksFound" inherits="GameFontNormal" text="Links Found: 99999" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="138" y="25" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="278" y="-72" />
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="LNKPDFrame_BuildCache_Hide" inherits="UIPanelButtonTemplate" movable="true" text="Hide Window">
+				<Size>
+					<AbsDimension x="111" y="23" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset x="27" y="-137" />
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						LNKPDFrame_BuildCache_HideWindow_OnClick();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="LNKPDFrame_BuildCache_Cancel" inherits="UIPanelButtonTemplate" movable="true" text="Cancel">
+				<Size>
+					<AbsDimension x="75" y="23" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset x="338" y="-137" />
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						LNKPDFrame_BuildCache_Cancel_OnClick();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Frame name="LNKPDFrame_BuildCache_ProgressBack" movable="true">
+				<Size>
+					<AbsDimension x="408" y="50" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset x="17" y="-92" />
+					</Anchor>
+				</Anchors>
+				<Backdrop bgFile="Interface\FrameGeneral\UI-Background-Rock" edgeFile="">
+					<BackgroundInsets>
+						<AbsInset left="11" right="12" top="12" bottom="11" />
+					</BackgroundInsets>
+				</Backdrop>
+				<Frames>
+					<Frame name="LNKPDFrame_BuildCache_ProgressBar" movable="true">
+						<Size>
+							<AbsDimension x="408" y="50" />
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset x="0" y="0" />
+							</Anchor>
+						</Anchors>
+						<Backdrop bgFile="Interface\CHARACTERFRAME\UI-BarFill-Simple" edgeFile="">
+							<BackgroundInsets>
+								<AbsInset left="11" right="12" top="12" bottom="11" />
+							</BackgroundInsets>
+						</Backdrop>
+						<Layers>
+							<Layer level="OVERLAY">
+								<FontString name="LNKPDFrame_BuildCache_Percent" inherits="GameFontNormal" text="100%">
+									<Size>
+										<AbsDimension x="386" y="23" />
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset x="11" y="-14" />
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+					</Frame>
+				</Frames>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				LNKPDFrame_BuildCache_OnLoad();
+				self:RegisterForDrag("LeftButton");
+			</OnLoad>
+			<OnDragStart>
+				self:StartMoving();
+			</OnDragStart>
+			<OnDragStop>
+				self:StopMovingOrSizing();
+			</OnDragStop>
+		</Scripts>
+	</Frame>
+	<Frame name="LNKPDFrame_Welcome" hidden="true" movable="true" enableMouse="true" clampedToScreen="true">
+		<Size>
+			<AbsDimension x="408" y="343" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativePoint="CENTER">
+				<Offset x="0" y="0" />
+			</Anchor>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32" />
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="LNKPDFrame_Welcome_Title" inherits="GameFontNormal" text="Welcome to Linkepedia!">
+					<Size>
+						<AbsDimension x="402" y="17" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="6" y="-16" />
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="LNKPDFrame_Welcome_Body1" inherits="GameFontNormal" font="Fonts\ARIALN.TTF" text="Welcome to Linkepedia. Formally Linkerator by Fizzwidget, Linkepedia offers the ability to easily link items or spells in macros, chats, or search part of a link. Using the same functionality that was provided in Linkerator, players will once again be able to enjoy one of the best linking addons of all time." justifyV="TOP" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="356" y="59" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="26" y="-43" />
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="11" />
+					</FontHeight>
+				</FontString>
+				<FontString name="LNKPDFrame_Welcome_Body2" inherits="GameFontNormal" font="Fonts\ARIALN.TTF" text="Since this is your first time running Linkepedia, you must BUILD your item database. Without doing this, you will not be able to link items until the background scanning completes, which could take hours!" justifyV="TOP" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="356" y="44" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="26" y="-106" />
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="11" />
+					</FontHeight>
+				</FontString>
+				<FontString name="LNKPDFrame_Welcome_Body3" inherits="GameFontNormal" font="Fonts\ARIALN.TTF" text="Here are the list of common commands:" justifyV="TOP" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="356" y="19" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="26" y="-150" />
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="LNKPDFrame_Welcome_Command1" inherits="GameFontNormal" font="Fonts\ARIALN.TTF" text="/linkepedia build      - Build your item database" justifyV="TOP" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="360" y="19" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="40" y="-170" />
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="11" />
+					</FontHeight>
+				</FontString>
+				<FontString name="LNKPDFrame_Welcome_Command2" inherits="GameFontNormal" font="Fonts\ARIALN.TTF" text="/linkepedia expand  - Expand your current database" justifyV="TOP" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="360" y="19" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="40" y="-185" />
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="11" />
+					</FontHeight>
+				</FontString>
+				<FontString name="LNKPDFrame_Welcome_Command3" inherits="GameFontNormal" font="Fonts\ARIALN.TTF" text="/linkepedia show     - Show the progress window" justifyV="TOP" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="360" y="19" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="40" y="-200" />
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="11" />
+					</FontHeight>
+				</FontString>
+				<FontString name="LNKPDFrame_Welcome_Command4" inherits="GameFontNormal" font="Fonts\ARIALN.TTF" text="/linkepedia help       - Show full command list" justifyV="TOP" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="360" y="19" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="40" y="-215" />
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="11" />
+					</FontHeight>
+				</FontString>
+				<FontString name="LNKPDFrame_Welcome_Command4" inherits="GameFontNormal" font="Fonts\ARIALN.TTF" text="/link X                     - Where X is the search term for an item" justifyV="TOP" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="360" y="19" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="40" y="-248" />
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="11" />
+					</FontHeight>
+				</FontString>
+				<FontString name="LNKPDFrame_Welcome_Command4" inherits="GameFontNormal" font="Fonts\ARIALN.TTF" text="/linkspell X              - Where X is the search term for a spell" justifyV="TOP" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="360" y="19" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="40" y="-264" />
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="11" />
+					</FontHeight>
+				</FontString>
+				<FontString name="LNKPDFrame_Welcome_Command4" inherits="GameFontNormal" font="Fonts\ARIALN.TTF" text="/linkepedia delay X  - Set the auto-complete delay" justifyV="TOP" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="360" y="19" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="40" y="-232" />
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="11" />
+					</FontHeight>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="LNKPDFrame_Welcome_Build" inherits="UIPanelButtonTemplate" text="Build Database Now!">
+				<Size>
+					<AbsDimension x="159" y="20" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset x="123" y="-299" />
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						LNKPDFrame_Welcome_Build_OnClick();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="LNKPDFrame_Welcome_Close" inherits="UIPanelButtonTemplate" text="X">
+				<Size>
+					<AbsDimension x="17" y="17" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset x="377" y="-16" />
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						LNKPDFrame_Welcome_Close_OnClick();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				self:RegisterForDrag("LeftButton");
+			</OnLoad>
+			<OnDragStart>
+				self:StartMoving();
+			</OnDragStart>
+			<OnDragStop>
+				self:StopMovingOrSizing();
+			</OnDragStop>
+		</Scripts>
+	</Frame>
+	<Frame name="LinkepediaFrame">
+		<Scripts>
+			<OnLoad>
+				LNKPD_OnLoad(self);
+			</OnLoad>
+			<OnUpdate>
+				LNKPD_OnUpdate(self, elapsed);
+			</OnUpdate>
+			<OnEvent>
+				LNKPD_OnEvent(self, event);
+			</OnEvent>
+		</Scripts>
+	</Frame>
+	<Frame name="LNKPDFrame_Update" hidden="true" movable="true" enableMouse="true" clampedToScreen="true">
+		<Size>
+			<AbsDimension x="574" y="316" />
+		</Size>
+		<Anchors>
+			<Anchor point="CENTER" relativePoint="CENTER">
+				<Offset x="0" y="0" />
+			</Anchor>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11" />
+			</BackgroundInsets>
+			<TileSize>
+				<AbsValue val="32" />
+			</TileSize>
+			<EdgeSize>
+				<AbsValue val="32" />
+			</EdgeSize>
+		</Backdrop>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="LNKPDFrame_Update_Title" inherits="GameFontNormal" text="Linkepedia Update!">
+					<Size>
+						<AbsDimension x="568" y="13" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="3" y="-20" />
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="LNKPDFrame_Update_VersionChange" inherits="GameFontNormal" text="Ugrading from X to X">
+					<Size>
+						<AbsDimension x="571" y="23" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="3" y="-34" />
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="10" />
+					</FontHeight>
+				</FontString>
+				<FontString name="LNKPDFrame_Update_Info" inherits="GameFontNormal" font="Fonts\ARIALN.TTF" text="Update Information Goes Here" justifyV="TOP" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="543" y="241" />
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset x="14" y="-63" />
+						</Anchor>
+					</Anchors>
+					<FontHeight>
+						<AbsValue val="11" />
+					</FontHeight>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="LNKPDFrame_Update_Close" inherits="UIPanelButtonTemplate" text="X">
+				<Size>
+					<AbsDimension x="17" y="17" />
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset x="540" y="-16" />
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						LNKPDFrame_Update_Close_OnClick();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				self:RegisterForDrag("LeftButton");
+			</OnLoad>
+			<OnDragStart>
+				self:StartMoving();
+			</OnDragStart>
+			<OnDragStop>
+				self:StopMovingOrSizing();
+			</OnDragStop>
+		</Scripts>
+	</Frame>
+</Ui>
