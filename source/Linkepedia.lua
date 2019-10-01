@@ -22,10 +22,11 @@ local LNKPD_ForceHighlight = false;
 
 -- number greater than the highest known item ID, used to import link names from client cache.
 -- may need updating as future patches/expansions add items to the game.
-LNKPD_MAX_ITEM_ID               = 134047;
+LNKPD_MAX_ITEM_ID               = 25000;
 LNKPD_MAX_SPELL_ID              = 200000;
 LNKPD_DEFAULT_DELAY             = 0.25;
 LNKPD_MAX_TABLE_KEY             = 3;
+LNKPD_MAX_UPDATES_PER_FRAME 	= 5;
 
 -- BETA USE ONLY!!! --
 local LNKPD_TimeOfLoad = GetTime();
@@ -53,7 +54,6 @@ end
 ------------------------------------------------------
 -- Autocompletion in chat edit box
 ------------------------------------------------------
-
 function LNKPD_ChatEdit_OnChar(self, text)
 	local ChatFrameIndex = string.match(GetFocusedChatFrame():GetName(),"%d+")
 	if (not LNKPD_ChatEdit_ShouldComplete(self)) then
@@ -108,6 +108,7 @@ function LNKPD_ChatEdit_Complete(editBox)
 	if (not LNKPD_ChatEdit_ShouldComplete(editBox)) then return; end
 
 	local text = editBox:GetText();
+	 -- ChatFrame1:AddMessage("Text: \"" .. gsub(text, "\124", "\124\124") .. "\"");
 
 	-- if the text contains any completed (brackets on both sides) links, "linkify" them
     local newText = LNKPD_ParseChatMessage(text);
@@ -375,7 +376,6 @@ function LNKPD_OnEvent(self, event, ...)
 end
 
 function LNKPD_LinkepediaCommand(msg)
-    
     -- do not run any commands
     if(LNKPD_SavedVariablesLoaded == false) then
         LINKPDUtils.Print("Linkepedia is not done loading. Please wait!");
@@ -388,7 +388,7 @@ function LNKPD_LinkepediaCommand(msg)
 
 	-- Print Help
 	if ( msg == "help" ) or ( msg == "" ) then
-		local version = GetAddOnMetadata("Linkepedia", "Version");
+		local version = GetAddOnMetadata("LinkepediaClassic", "Version");
 		LNKPDUtils.Print("Linkepedia "..version..":");
 		LNKPDUtils.Print("/linkepedia <command>");
 		LNKPDUtils.Print("- " .. LNKPDUtils.Lite("help")            .. " - Print this helplist.");
@@ -823,7 +823,7 @@ function LNKPD_ParseChatMessage(text)
     --_, link = GetItemInfo(lnktext)
     --if (link and string.find(text, "[", 1, true) and string.find(text, "]", 1, true)) then
         --return link;
-    --else
+	--else
 	   return string.gsub(text, "(|?h?)%[(.-)%](|?h?)", LNKPD_LinkifyName);
     --end
 end
@@ -965,6 +965,7 @@ local LNKPD_prevTimeLag       = 0;
 local LNKPD_timeToLag         = 0;
 local LNKPD_expandBounceSec   = 2;
 local LKNPD_prevExpandTime    = 0;
+local LNKPD_chunkIterator	  = 0;
 
 -- Scan the database for items
 function LNKPD_UpdateModeIdleScan()
@@ -1016,11 +1017,12 @@ function LNKPD_UpdateModeBuild()
     local itemID = LNKPDSV_ValidSearchID[LNKPD_currentSearchIDX];
     local itemName, itemLink = GetItemInfo(itemID);
 
-    -- If the item exists, then cache it
-    if(itemName) then
+	-- If the item exists, then cache it
+    if(itemName ~= nil) then
         LNKPD_CacheItem(itemLink, LNKPD_currentSearchIDX);
         table.remove(LNKPDSV_ValidSearchID, LNKPD_currentSearchIDX);
-        LNKPD_linksFound = LNKPD_linksFound + 1;
+		LNKPD_linksFound = LNKPD_linksFound + 1;
+		LNKPDUtils.Print("Item Name " .. itemName);
     else
         LNKPD_currentSearchIDX = LNKPD_currentSearchIDX + 1;
     end
@@ -1068,22 +1070,125 @@ function LNKPD_UpdateModeWait()
 
 end
 
+local MAX_ITERATIONS = 500;
+local testIterator = 0;
+local testMode = 0;
+local testIterations = 0;
+
+function QuickQuery(idx)
+	LNKPD_showResults = true
+    LNKPD_printPrefix = "Testing"
+
+    local itemID = LNKPDSV_ValidSearchID[idx];
+    
+	-- Check for a valid item. GetItemIcon is quick. If it's invalid, remove it. Else, send query for it
+	local icon = GetItemIcon(itemID);
+	if(icon == nil) then
+		-- LNKPDUtils.Print("Debug: Could Not Find Item " .. itemID);
+        -- table.remove(LNKPDSV_ValidSearchID, idx)
+	else
+		-- LNKPDUtils.Print("Debug: Found Item " .. itemID);
+        GetItemInfo(itemID);
+	end
+	-- LNKPD_percNum = LNKPD_percNum + 1;
+end
+
+function QuickBuild(idx)
+	LNKPD_showResults = true
+    LNKPD_printPrefix = "Building"
+
+    -- Search grab an ID we want a link for
+    local itemID = LNKPDSV_ValidSearchID[idx];
+    local itemName, itemLink = GetItemInfo(itemID);
+
+	-- If the item exists, then cache it
+    if(itemName ~= nil) then
+        LNKPD_CacheItem(itemLink, idx);
+        -- table.remove(LNKPDSV_ValidSearchID, idx);
+		LNKPD_linksFound = LNKPD_linksFound + 1;
+		LNKPDUtils.Print("Item Name " .. itemName);
+	end
+
+    LNKPD_percNum = LNKPD_percNum + 1;
+
+    -- if we have found everything, then let's stop building
+    -- if(LNKPD_currentSearchIDX > getn(LNKPDSV_ValidSearchID)) then
+    --     LNKPDUtils.Print(LNKPD_printPrefix .. LNKPDUtils.Lite(" 100%"));
+    --     LNKPDUtils.Print("Links Found: " .. LNKPDUtils.Lite(LNKPD_linksFound));
+-- 
+    --     LNKPDFrame_SetIdleState();
+    --     LNKPDFrame_BuildCache:Hide();
+    --     
+    --     LNKPD_currentSearchIDX = 1;
+    --     LNKPD_linksFound       = 0;
+    --     LNKPD_showResults      = false;
+    --     LNKPD_updateMode       = LNKPD_UpdateModeIdleScan
+    --     LNKPD_percNum          = 0;
+    --     LNKPD_percDenom        = getn(LNKPDSV_ValidSearchID);
+    -- end
+end
+
+function LNKPD_UpdateModeTest()
+	testIterator = testIterator + 1;
+	
+	if(testIterator >= MAX_ITERATIONS) then
+		testIterator = 0;
+		
+		if(testMode == 0) then
+			testMode = 1;
+			LNKPDUtils.Print("Now Building");
+		else
+			testMode = 0;
+			LNKPDUtils.Print("Now Querying");
+			testIterations = testIterations + 1;
+		end
+
+	end
+
+	local idx = testIterator + (testIterations * MAX_ITERATIONS);
+	LNKPDUtils.Print("Current Index " .. idx);
+	if(testMode == 0) then
+		QuickQuery(idx);
+	else
+		QuickBuild(idx);
+	end
+
+	LNKPD_currentSearchIDX = LNKPD_currentSearchIDX + 1;
+	if(idx > LNKPD_MAX_ITEM_ID) then
+		LNKPDUtils.Print("Test Complete");
+		LNKPD_updateMode  = LNKPD_UpdateModeIdleScan;
+	end
+	
+    -- Else we are finished with the query stage, now wait for 5 seconds then build the DB
+    -- if(LNKPD_currentSearchIDX > getn(LNKPDSV_ValidSearchID)) then
+    --    LNKPDUtils.Print(LNKPD_printPrefix .. ": " .. LNKPDUtils.Lite(" 100%"));
+    --    LNKPDUtils.Print("Query Complete. Waiting 5 seconds before building the database.");
+    --    LNKPD_updateMode  = LNKPD_UpdateModeWait
+    --    LNKPD_timeToLag   = 5
+    --    LNKPD_prevTimeLag = GetTime();
+    -- end
+end
+
 -- Query the database for items
 function LNKPD_UpdateModeQuery()
     LNKPD_showResults = true
     LNKPD_printPrefix = "Querying"
 
     local itemID = LNKPDSV_ValidSearchID[LNKPD_currentSearchIDX];
-        
-    -- Check for a valid item. GetItemIcon is quick. If it's invalid, remove it. Else, send query for it
-    if(GetItemIcon(itemID) == nil) then
+    
+	-- Check for a valid item. GetItemIcon is quick. If it's invalid, remove it. Else, send query for it
+	local icon = GetItemIcon(itemID);
+	if(icon == nil) then
+		LNKPDUtils.Print("Debug: Could Not Find Item " .. itemID);
         table.remove(LNKPDSV_ValidSearchID, LNKPD_currentSearchIDX)
-    else
+	else
+		LNKPDUtils.Print("Debug: Found Item " .. itemID);
         GetItemInfo(itemID);
         LNKPD_currentSearchIDX = LNKPD_currentSearchIDX + 1;
-    end
+	end
 
-    LNKPD_percNum = LNKPD_percNum + 1;
+
+	LNKPD_percNum = LNKPD_percNum + 1;
 
     -- Else we are finished with the query stage, now wait for 5 seconds then build the DB
     if(LNKPD_currentSearchIDX > getn(LNKPDSV_ValidSearchID)) then
@@ -1148,11 +1253,10 @@ function LNKPD_RebuildCache()
 	
     -- Clear out old variables
     LNKPDSV_ActiveItemLink = {}
-
     LNKPDSV_ValidSearchID   = {};
 
     LNKPD_currentSearchIDX = 1;
-    LNKPD_updatesPerFrame  = 50;
+    LNKPD_updatesPerFrame  = LNKPD_MAX_UPDATES_PER_FRAME;
     LNKPD_linksFound       = 0;
 
     for i = 1, LNKPD_MAX_ITEM_ID do
@@ -1161,7 +1265,8 @@ function LNKPD_RebuildCache()
 
     LNKPD_percDenom   = LNKPD_MAX_ITEM_ID;
     LNKPD_percNum     = 0;
-    LNKPD_updateMode  = LNKPD_UpdateModeQuery;
+	-- LNKPD_updateMode  = LNKPD_UpdateModeQuery;
+	LNKPD_updateMode = LNKPD_UpdateModeTest;
 
     -- Set up the frame to be ready to build
     LNKPDFrame_ShowBuild();
@@ -1176,7 +1281,7 @@ end
 function LNKPD_ExpandCache()
 
     LNKPD_currentSearchIDX = 1;
-    LNKPD_updatesPerFrame  = 50;
+    LNKPD_updatesPerFrame  = LNKPD_MAX_UPDATES_PER_FRAME;
     LNKPD_linksFound       = 0;
     LNKPD_percDenom        = getn(LNKPDSV_ValidSearchID);
     LNKPD_percNum          = 0;

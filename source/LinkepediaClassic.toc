@@ -21,12 +21,11 @@
 ## Version: 1.0.0
 ## Author: GhostfromTexas
 ## Interface: 11302
-## Notes: Link Everything! Type '/link help' for info!
+## Notes: Remembers item links so you can type them out later.
 ## SavedVariables: LNKPDSV_ActiveItemLink
 ## SavedVariables: LNKPDSV_ValidSearchID
 ## SavedVariables: LNKPDSV_Version
 ## SavedVariables: LNKPDSV_AutoCompleteDelay
-## SavedVariables: LNKPDSV_TestVar
 
 LinkepediaFrame.lua
 LinkepediaUtils.lua

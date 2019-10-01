@@ -263,6 +263,9 @@
 							<Offset x="26" y="-150" />
 						</Anchor>
 					</Anchors>
+					<FontHeight>
+						<AbsValue val="11" />
+					</FontHeight>
 				</FontString>
 				<FontString name="LNKPDFrame_Welcome_Command1" inherits="GameFontNormal" font="Fonts\ARIALN.TTF" text="/linkepedia build      - Build your item database" justifyV="TOP" justifyH="LEFT">
 					<Size>

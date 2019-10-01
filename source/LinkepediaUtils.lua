@@ -63,6 +63,8 @@ function LNKPDUtils_TableCount(aTable)
 end
 
 function LNKPDUtils_LinkCompress(link)
+	-- local printable = gsub(link, "\124", "\124\124");
+	-- ChatFrame1:AddMessage("Here's what it really looks like: \"" .. printable .. "\"");
     local color, itemID, _, _, name = link:match("|(.-)|Hitem:(.-):.-:.-:.-:.-:.-:(.-):(.-):.+|h%[(.-)%]|h|r");
     color = LNKPDUtils_COLORS[color];
     local data = name .. "~" .. color .. "~" .. itemID;
@@ -73,7 +75,8 @@ function LNKPDUtils_LinkDecompress(data)
     --local name, color, itemID = data:match("(.-)~(.-)~(.+)");
     local name, color, itemID = strsplit("~", data);
     -- local link = string.format("|%s|Hitem:%s:0:0:0:0:0:0:0:72:0|h[%s]|h|r", LNKPDUtils_COLORS[color], itemID, name )
-    local link = "|" .. LNKPDUtils_COLORS[color] .. "|Hitem:" .. itemID .. ":0:0:0:0:0:0:0:100:0:0:0:0|h[" .. name .. "]|h|r";
+	local link = "|" .. LNKPDUtils_COLORS[color] .. "|Hitem:" .. itemID .. "::::::::100:::::::|h[" .. name .. "]|h|r";
+	-- local link = "|" .. LNKPDUtils_COLORS[color] .. "|Hitem:" .. itemID .. "|h[" .. name .. "]|h|r";
     return link;
 end
 
